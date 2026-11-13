@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CA QA Security Agent</title>
+<style>
+:root {
+  --bg: #f3f5f6; --panel: #ffffff; --ink: #16222c; --muted: #5d6b77; --line: #d9e0e5;
+  --accent: #0a6c74; --accent-ink: #ffffff;
+  --high: #b42318; --medium: #c2570c; --low: #8a6a00; --informational: #475467;
+  --ok: #1a7f4b;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #11181d; --panel: #19232a; --ink: #e6edf1; --muted: #93a2ad; --line: #2b3943;
+          --accent: #35b3bd; --accent-ink: #082126; --high: #f0776c; --medium: #f0a060; --low: #d9b84a;
+          --informational: #98a6b3; --ok: #54c88a; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, "Segoe UI", sans-serif; }
+header { display: flex; align-items: center; gap: 24px; padding: 14px 28px; background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+header h1 { font-size: 18px; margin: 0; font-weight: 650; }
+nav { display: flex; gap: 4px; }
+nav button { background: none; border: 0; padding: 8px 14px; border-radius: 6px; font: inherit; color: var(--muted); cursor: pointer; }
+nav button[aria-current="true"] { background: var(--bg); color: var(--ink); font-weight: 600; }
+main { max-width: 1180px; margin: 0 auto; padding: 24px 28px 60px; display: grid; gap: 20px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px 22px; }
+h2 { font-size: 16px; margin: 0 0 14px; }
+label.f { display: block; font-weight: 600; margin: 14px 0 6px; }
+textarea, input[type=number], select { width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; }
+textarea { min-height: 84px; resize: vertical; font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mods { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.mod { display: grid; grid-template-columns: 24px 1fr auto; gap: 10px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.mod:last-child { border-bottom: 0; }
+.mod:hover { background: var(--bg); }
+.mod small { color: var(--muted); display: block; }
+.tag { font-size: 12px; border: 1px solid var(--line); border-radius: 99px; padding: 1px 10px; color: var(--muted); white-space: nowrap; }
+.tag.High { border-color: var(--high); color: var(--high); }
+.tag.Medium { border-color: var(--medium); color: var(--medium); }
+.tag.Built { border-color: var(--ok); color: var(--ok); }
+details { margin-top: 14px; }
+summary { cursor: pointer; color: var(--muted); }
+.adv { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+.adv .wide { grid-column: 1 / -1; }
+.hint { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
+.row { display: flex; align-items: center; gap: 14px; margin-top: 18px; flex-wrap: wrap; }
+.auth { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding: 10px 12px; background: var(--bg); border-radius: 6px; }
+.auth input { margin-top: 4px; }
+button.primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 6px; padding: 10px 26px; font: inherit; font-weight: 650; cursor: pointer; }
+button.primary:disabled { opacity: .5; cursor: default; }
+button.link { background: none; border: 0; color: var(--accent); font: inherit; cursor: pointer; padding: 0; text-decoration: underline; }
+#msg { font-size: 14px; } #msg.err { color: var(--high); }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 14px; }
+th { color: var(--muted); font-weight: 600; font-size: 13px; }
+td.url { word-break: break-all; }
+.status { font-weight: 600; } .status.done { color: var(--ok); } .status.failed { color: var(--high); } .status.running { color: var(--accent); }
+.sev { color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 4px; display: inline-block; }
+.sev.high { background: var(--high); } .sev.medium { background: var(--medium); } .sev.low { background: var(--low); } .sev.informational { background: var(--informational); }
+.top { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+.score { font-size: 64px; font-weight: 700; line-height: 1; }
+.score small { font-size: 18px; color: var(--muted); font-weight: 500; }
+.cards { display: flex; gap: 10px; flex-wrap: wrap; }
+.cards div { min-width: 96px; padding: 10px 14px; border-radius: 6px; color: #fff; }
+.cards b { display: block; font-size: 24px; }
+.cards .high { background: var(--high); } .cards .medium { background: var(--medium); } .cards .low { background: var(--low); } .cards .informational { background: var(--informational); }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 18px; }
+.bar { display: grid; grid-template-columns: 1fr 60px; gap: 8px; font-size: 13px; margin: 4px 0; }
+.bar i { display: block; height: 8px; background: var(--accent); border-radius: 4px; margin-top: 7px; }
+.filters { display: flex; gap: 10px; margin: 16px 0 6px; } .filters select { width: auto; }
+.reg { border-left: 4px solid var(--line); padding: 8px 14px; margin-top: 16px; background: var(--bg); border-radius: 0 6px 6px 0; }
+.reg.regressed { border-color: var(--high); } .reg.improved { border-color: var(--ok); }
+.empty { color: var(--muted); padding: 18px 0; }
+.targets { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.target { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+.target .u { word-break: break-all; font-weight: 600; font-size: 14px; }
+.hidden { display: none; }
+@media (max-width: 640px) { .adv { grid-template-columns: 1fr; } main { padding: 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>CA QA Security Agent</h1>
+  <nav>
+    <button data-tab="scan" aria-current="true">Scans</button>
+    <button data-tab="dash" aria-current="false">Dashboard</button>
+  </nav>
+</header>
+
+<main>
+<section id="tab-scan" style="display:grid;gap:20px">
+  <div class="panel">
+    <h2>New scan</h2>
+    <label class="f" for="urls">Application URLs <span class="hint" style="font-weight:400">one per line</span></label>
+    <textarea id="urls" placeholder="https://customerportal.qa.example.com/my-requests"></textarea>
+
+    <label class="f">Checks to run</label>
+    <div class="mods" id="mods"></div>
+    <p class="hint" id="activeNote"></p>
+
+    <details>
+      <summary>Advanced options</summary>
+      <div class="adv">
+        <div><label class="f" for="maxPages" style="margin-top:0">Pages to crawl</label>
+          <input type="number" id="maxPages" value="20" min="1" max="100"></div>
+        <div><label class="f" for="owaspV" style="margin-top:0">OWASP edition</label>
+          <select id="owaspV"><option value="2025">Top 10:2025</option><option value="2021">Top 10:2021</option></select></div>
+        <div class="wide"><label class="f" for="stateFile" style="margin-top:0">Login session (optional)</label>
+          <input type="file" id="stateFile" accept=".json,application/json">
+          <p class="hint">A Playwright storage-state file from a dedicated test account. It is used for this scan and deleted afterwards.</p></div>
+      </div>
+    </details>
+
+    <label class="auth"><input type="checkbox" id="authz">
+      <span>I own these applications or have written permission to test them.</span></label>
+    <div class="row">
+      <button class="primary" id="scanBtn">Scan</button>
+      <span id="msg" role="status"></span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Recent scans</h2>
+    <div id="scans"><p class="empty">No scans yet. Enter a URL above and select Scan.</p></div>
+  </div>
+
+  <div class="panel hidden" id="detail"></div>
+</section>
+
+<section id="tab-dash" class="hidden">
+  <div class="panel">
+    <h2>Risk score by application</h2>
+    <p class="hint">Applications are listed worst first. Scores come from scans that included "Security dashboard and risk scoring".</p>
+    <div id="targets" class="targets"></div>
+  </div>
+</section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const SEV = ["high", "medium", "low", "informational"];
+let MODS = [], CURRENT = null, openId = null;
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.detail || r.statusText);
+  return j;
+}
+
+/* ---------- tabs ---------- */
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.setAttribute("aria-current", x === b));
+  $("#tab-scan").classList.toggle("hidden", b.dataset.tab !== "scan");
+  $("#tab-dash").classList.toggle("hidden", b.dataset.tab !== "dash");
+  if (b.dataset.tab === "dash") loadDash();
+});
+
+/* ---------- new scan ---------- */
+async function loadModules() {
+  const j = await api("/api/modules");
+  MODS = j.modules;
+  $("#mods").innerHTML = MODS.map(m => `
+    <label class="mod"><input type="checkbox" value="${esc(m.id)}" ${m.id === "crawl_headers" ? "checked" : ""}>
+      <span>${esc(m.label)}${m.active ? '<small>Sends test requests to GET parameters. Allow-listed hosts only.</small>' : ""}</span>
+      <span class="tag ${esc(m.priority)}">${esc(m.priority)}</span></label>`).join("");
+  $("#activeNote").textContent = j.active_allowed_hosts_configured ? "" :
+    "Injection testing is disabled until an administrator sets SCAN_ALLOWED_HOSTS on the server.";
+}
+
+$("#scanBtn").onclick = async () => {
+  const msg = $("#msg"); msg.className = ""; msg.textContent = "";
+  const urls = $("#urls").value.split("\n").map(s => s.trim()).filter(Boolean);
+  const modules = [...document.querySelectorAll("#mods input:checked")].map(i => i.value);
+  if (!urls.length) return fail("Enter at least one URL.");
+  if (!modules.length) return fail("Select at least one check.");
+  if (!$("#authz").checked) return fail("Confirm that you are authorised to test these applications.");
+  let storage_state = null;
+  const f = $("#stateFile").files[0];
+  if (f) storage_state = await f.text();
+  $("#scanBtn").disabled = true;
+  try {
+    const j = await api("/api/scans", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ urls, modules, authorized: true, storage_state,
+        max_pages: +$("#maxPages").value || 20, owasp_version: $("#owaspV").value }) });
+    msg.textContent = `Started ${j.ids.length} scan${j.ids.length > 1 ? "s" : ""}.`;
+    openId = j.ids[0];
+    refresh();
+  } catch (e) { fail(e.message); }
+  $("#scanBtn").disabled = false;
+  function fail(t) { msg.className = "err"; msg.textContent = t; }
+};
+
+/* ---------- scan list ---------- */
+async function refresh() {
+  const { scans } = await api("/api/scans");
+  if (!scans.length) return;
+  const label = Object.fromEntries(MODS.map(m => [m.id, m.label.split(" (")[0]]));
+  $("#scans").innerHTML = `<table><thead><tr><th>Application</th><th>Checks</th><th>Status</th><th>Score</th><th>Findings</th><th>Started</th><th></th></tr></thead><tbody>` +
+    scans.map(s => {
+      const bs = s.summary?.by_severity;
+      return `<tr><td class="url">${esc(s.target)}</td>
+        <td>${(s.modules || []).map(m => esc(label[m] || m)).join(", ")}</td>
+        <td><span class="status ${esc(s.status)}">${esc(s.status)}</span><br><small class="hint">${esc(s.status === "failed" ? s.error : s.status === "done" ? "" : s.progress)}</small></td>
+        <td>${s.score ?? "–"}</td>
+        <td>${bs ? `${bs.high} high, ${bs.medium} med, ${bs.low} low` : "–"}</td>
+        <td>${esc((s.created_at || "").replace("T", " ").slice(0, 16))}</td>
+        <td>${s.status === "done" ? `<button class="link" data-open="${esc(s.id)}">View</button>` : ""}</td></tr>`;
+    }).join("") + `</tbody></table>`;
+  document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { openId = b.dataset.open; CURRENT = null; showDetail(); });
+  if (openId && CURRENT?.id !== openId) showDetail(scans.find(s => s.id === openId));
+  if (scans.some(s => s.status === "queued" || s.status === "running")) setTimeout(refresh, 3000);
+}
+
+async function showDetail(meta) {
+  if (meta && meta.status !== "done") return;
+  if (CURRENT?.id !== openId) CURRENT = await api(`/api/scans/${openId}`);
+  if (CURRENT.status !== "done") { CURRENT = null; return; }
+  renderDetail();
+  $("#detail").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ---------- scan detail ---------- */
+function renderDetail() {
+  const s = CURRENT, r = s.report, el = $("#detail");
+  el.classList.remove("hidden");
+  const bs = r.summary.by_severity;
+  const risk = r.risk, reg = r.regression;
+  const colour = risk ? (risk.score >= 80 ? "var(--ok)" : risk.score >= 50 ? "var(--medium)" : "var(--high)") : "";
+  const maxBar = (o) => Math.max(1, ...Object.values(o));
+  const bars = (o) => Object.entries(o).map(([k, v]) =>
+    `<div class="bar"><div>${esc(k)}<i style="width:${v / maxBar(o) * 100}%"></i></div><div>${v}</div></div>`).join("") || '<p class="empty">None</p>';
+
+  el.innerHTML = `
+    <div class="top">
+      ${risk ? `<div><div class="score" style="color:${colour}">${risk.score}<small> / 100 &nbsp;grade ${esc(risk.grade)}</small></div></div>` : ""}
+      <div>
+        <h2 style="margin-bottom:4px">${esc(r.target)}</h2>
+        <div class="hint">${r.pages_scanned} pages · ${esc(r.owasp_version)} · <a href="/api/scans/${esc(s.id)}/report.html" target="_blank" rel="noopener">HTML report</a> · <a href="/api/scans/${esc(s.id)}/report.json">JSON</a></div>
+      </div>
+      <div class="cards">${SEV.map(k => `<div class="${k}"><b>${bs[k]}</b>${k[0].toUpperCase() + k.slice(1)}</div>`).join("")}</div>
+    </div>
+    ${reg ? regHtml(reg) : ""}
+    ${risk ? `<div class="cols">
+      <div><h2>Biggest risks</h2>${risk.top_risks.map(t => `<div class="bar"><div><span class="sev ${t.severity}">${t.severity}</span> ${esc(t.title)} <span class="hint">×${t.occurrences}</span></div><div>−${t.penalty}</div></div>`).join("") || '<p class="empty">No scored issues.</p>'}</div>
+      <div><h2>By OWASP category</h2>${bars(risk.by_owasp)}</div></div>` : ""}
+    <div class="filters">
+      <select id="fSev"><option value="">All severities</option>${SEV.map(k => `<option>${k}</option>`).join("")}</select>
+      <select id="fMod"><option value="">All checks</option>${r.modules.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join("")}</select>
+    </div>
+    <div id="findings"></div>`;
+  $("#fSev").onchange = $("#fMod").onchange = renderFindings;
+  renderFindings();
+}
+
+function regHtml(g) {
+  if (g.status === "no_baseline") return `<div class="reg"><b>Regression</b><br>${esc(g.message)}</div>`;
+  const list = (a) => a.slice(0, 12).map(f => `<li><span class="sev ${f.severity}">${f.severity}</span> ${esc(f.title)} <span class="hint">${esc(f.url)}</span></li>`).join("") + (a.length > 12 ? `<li class="hint">+${a.length - 12} more</li>` : "");
+  const label = { regressed: "Regressed: new high or medium issues", improved: "Improved: issues fixed, nothing new", unchanged: "No change", "minor changes": "Minor changes" }[g.status] || g.status;
+  return `<div class="reg ${esc(g.status)}"><b>${esc(label)}</b>
+    <span class="hint"> compared with the scan from ${esc((g.baseline.created_at || "").slice(0, 16).replace("T", " "))}${g.baseline.score != null ? ` (score ${g.baseline.score})` : ""}</span>
+    <div class="cols" style="margin-top:8px"><div><b>New (${g.new.length})</b><ul>${list(g.new) || "<li class='hint'>None</li>"}</ul></div>
+    <div><b>Resolved (${g.resolved.length})</b><ul>${list(g.resolved) || "<li class='hint'>None</li>"}</ul></div></div>
+    <span class="hint">${g.persisting} issue${g.persisting === 1 ? "" : "s"} unchanged.</span></div>`;
+}
+
+function renderFindings() {
+  const r = CURRENT.report, sev = $("#fSev").value, mod = $("#fMod").value;
+  const groups = {};
+  for (const f of r.findings) {
+    if ((sev && f.severity !== sev) || (mod && f.module !== mod)) continue;
+    const k = `${f.severity}|${f.module}|${f.title}`;
+    (groups[k] ||= { f, items: [] }).items.push(f);
+  }
+  const rows = Object.values(groups).sort((a, b) => SEV.indexOf(a.f.severity) - SEV.indexOf(b.f.severity) || b.items.length - a.items.length);
+  $("#findings").innerHTML = rows.length ? `<table><thead><tr><th>Severity</th><th>Finding</th><th>Where</th><th>What to do</th></tr></thead><tbody>` +
+    rows.map(({ f, items }) => `<tr>
+      <td><span class="sev ${f.severity}">${f.severity.toUpperCase()}</span></td>
+      <td><b>${esc(f.title)}</b><br><span class="hint">${esc(f.owasp)} ${esc(f.owasp_category)} · ${esc(f.module)} · ${esc(f.confidence)}</span><br>${esc(f.evidence)}</td>
+      <td>${items.length === 1 ? `<span style="word-break:break-all">${esc(f.url)}</span>` :
+        `<details><summary>${items.length} pages</summary>${items.map(i => `<div style="word-break:break-all">${esc(i.url)}</div>`).join("")}</details>`}</td>
+      <td>${esc(f.recommendation)}</td></tr>`).join("") + "</tbody></table>"
+    : '<p class="empty">No findings match these filters.</p>';
+}
+
+/* ---------- dashboard ---------- */
+async function loadDash() {
+  const { targets } = await api("/api/dashboard");
+  $("#targets").innerHTML = targets.length ? targets.map(t => {
+    const h = t.history, last = h[h.length - 1];
+    const pts = h.map((p, i) => `${h.length === 1 ? 100 : i / (h.length - 1) * 200},${46 - p.score * 0.44}`).join(" ");
+    const c = last.score >= 80 ? "var(--ok)" : last.score >= 50 ? "var(--medium)" : "var(--high)";
+    const delta = h.length > 1 ? last.score - h[h.length - 2].score : null;
+    return `<div class="target"><div class="u">${esc(t.target)}</div>
+      <div class="score" style="color:${c};font-size:40px;margin:8px 0">${last.score}${delta !== null ? `<small> ${delta >= 0 ? "+" : ""}${delta} since last scan</small>` : ""}</div>
+      <svg viewBox="0 0 200 50" width="100%" height="50" role="img" aria-label="Score history"><polyline points="${pts}" fill="none" stroke="${c}" stroke-width="2"/></svg>
+      <div class="hint">${last.by_severity.high || 0} high · ${last.by_severity.medium || 0} medium · ${h.length} scan${h.length > 1 ? "s" : ""}</div></div>`;
+  }).join("") : '<p class="empty">No scored scans yet. Run a scan with "Security dashboard and risk scoring" selected.</p>';
+}
+
+loadModules().then(refresh);
+</script>
+</body>
+</html>

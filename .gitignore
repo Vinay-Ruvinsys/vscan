@@ -30,3 +30,7 @@ security-report.html
 # OS
 .DS_Store
 Thumbs.db
+
+# Scan history and generated reports
+scans.db
+reports/
