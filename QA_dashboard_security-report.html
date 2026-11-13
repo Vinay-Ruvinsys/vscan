@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CA QA - Web Security Agent Report</title>
+<style>
+body { font: 14px Arial; margin: 28px; color: #222; }
+h2 { margin-top: 34px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #ddd; padding: 9px; text-align: left; vertical-align: top; }
+th { background: #f3f5f7; }
+td.num { text-align: center; }
+ul { margin: 0; padding-left: 18px; }
+small { color: #666; }
+.cards { display: flex; gap: 12px; margin: 16px 0; }
+.card { flex: 1; padding: 12px; border-radius: 6px; text-align: center; color: #fff; }
+.card .n { font-size: 26px; font-weight: bold; }
+.high { background: #b42318; }
+.medium { background: #c2570c; }
+.low { background: #946c00; }
+.informational { background: #475467; }
+.badge { color: #fff; padding: 2px 7px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h1>CA QA Web Security Agent</h1>
+<p><b>Target:</b> http://10.128.0.194:8185/#/dashboard</p>
+<p><b>Generated:</b> 2026-11-11T15:46:04.175574+00:00</p>
+<p><b>Pages scanned:</b> 1 &nbsp; <b>Framework:</b> OWASP Top 10:2025</p>
+<p>Passive, non-destructive checks only. No fuzzing, exploit payloads, brute force, credential guessing, or state-changing requests.</p>
+
+<div class="cards"><div class="card high"><div class="n">2</div><div>High</div></div><div class="card medium"><div class="n">2</div><div>Medium</div></div><div class="card low"><div class="n">5</div><div>Low</div></div><div class="card informational"><div class="n">3</div><div>Informational</div></div></div>
+
+<h2>OWASP coverage summary</h2>
+<p><small>Coverage shows what the passive checks look for. "No findings" is not proof a category is secure.</small></p>
+<table>
+<thead><tr>
+<th>ID</th><th>Category</th><th>Coverage</th><th>Checks performed</th>
+<th>High</th><th>Med</th><th>Low</th><th>Info</th><th>Status</th>
+</tr></thead>
+<tbody><tr><td>A01:2025</td><td>Broken Access Control</td><td>Partial</td><td><ul><li>CSRF token heuristics on POST forms</li><li>SameSite cookie attribute</li><li>Permissive CORS headers</li><li>Object-reference IDs in form fields</li><li>Links to sensitive-looking paths (.git, .env, backups, admin)</li><li>URL / redirect-style parameters in links and form fields</li></ul></td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td class='num'>1</td><td>Findings reported</td></tr><tr><td>A02:2025</td><td>Security Misconfiguration</td><td>Partial</td><td><ul><li>CSP, X-Content-Type-Options, Referrer-Policy, Permissions-Policy</li><li>CSP weaknesses (unsafe-inline, unsafe-eval, wildcards)</li><li>Clickjacking protection</li><li>Server / framework version disclosure</li><li>Debug headers, directory listing, target=_blank without noopener</li></ul></td><td class='num'>0</td><td class='num'>2</td><td class='num'>4</td><td class='num'>0</td><td>Findings reported</td></tr><tr><td>A03:2025</td><td>Software Supply Chain Failures</td><td>Partial</td><td><ul><li>Client-side library versions vs known-vulnerable / end-of-life releases</li><li>Third-party iframes without sandbox</li><li>Third-party origin inventory</li></ul></td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td>No findings from passive checks</td></tr><tr><td>A04:2025</td><td>Cryptographic Failures</td><td>Partial</td><td><ul><li>HTTPS usage, HSTS presence and strength, mixed content</li><li>Secure cookie attribute</li><li>Password forms posting insecurely</li><li>Secrets / tokens in URLs and page source</li><li>Cache-Control on pages with password fields</li></ul></td><td class='num'>2</td><td class='num'>0</td><td class='num'>1</td><td class='num'>0</td><td>Findings reported</td></tr><tr><td>A05:2025</td><td>Injection</td><td>Indicators only</td><td><ul><li>URL parameter values reflected in the response</li><li>DOM source-to-sink patterns in inline scripts</li><li>Database error messages in responses</li><li>Injection-prone parameter names</li></ul></td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td>No findings from passive checks</td></tr><tr><td>A06:2025</td><td>Insecure Design</td><td>Minimal</td><td><ul><li>Client-trusted business values in hidden fields</li><li>File upload inputs without type restrictions</li></ul></td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td>Not assessable passively</td></tr><tr><td>A07:2025</td><td>Authentication Failures</td><td>Partial</td><td><ul><li>HttpOnly flag on cookies, session-cookie heuristics</li><li>Session IDs and credentials in URLs</li><li>Basic authentication</li><li>Login forms without CAPTCHA / MFA hints</li><li>Weak client-side password policy on sign-up forms</li></ul></td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td class='num'>1</td><td>Findings reported</td></tr><tr><td>A08:2025</td><td>Software or Data Integrity Failures</td><td>Partial</td><td><ul><li>Subresource Integrity (SRI) on third-party scripts and stylesheets</li><li>Weak SRI hash algorithms</li><li>Third-party resources loaded over HTTP</li><li>Serialized-object markers in cookies and hidden fields</li></ul></td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td>No findings from passive checks</td></tr><tr><td>A09:2025</td><td>Security Logging &amp; Alerting Failures</td><td>Minimal</td><td><ul><li>Browser reporting endpoints (Reporting-Endpoints, Report-To, CSP report-uri)</li></ul></td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td class='num'>1</td><td>Findings reported</td></tr><tr><td>A10:2025</td><td>Mishandling of Exceptional Conditions</td><td>Partial</td><td><ul><li>Stack traces and framework error pages</li><li>Debug-mode pages</li><li>HTTP 5xx responses</li><li>Server file-path disclosure in errors</li></ul></td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td class='num'>0</td><td>No findings from passive checks</td></tr></tbody>
+</table>
+
+<h2>Third-party origins</h2>
+<table>
+<thead><tr><th>Host</th><th>Scripts</th><th>Stylesheets</th><th>Iframes</th><th>Without SRI</th><th>Pages</th></tr></thead>
+<tbody><tr><td colspan='6'>No third-party origins observed.</td></tr></tbody>
+</table>
+
+<h2>Findings</h2>
+<table>
+<thead><tr>
+<th>Severity</th><th>OWASP</th><th>Finding</th><th>Page</th><th>Evidence</th><th>Recommendation</th>
+</tr></thead>
+<tbody>
+<tr><td><span class="badge high">HIGH</span></td><td>A04:2025<br><small>Cryptographic Failures</small></td><td>Page is served over HTTP<br><small>firm</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>The page URL does not use HTTPS.</td><td>Serve the application over HTTPS and redirect HTTP to HTTPS.</td></tr><tr><td><span class="badge high">HIGH</span></td><td>A04:2025<br><small>Cryptographic Failures</small></td><td>Password form may submit insecurely<br><small>firm</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>Password form submits via GET to http://10.128.0.194:8185/.</td><td>Use HTTPS for the page and form destination; avoid GET for credentials.</td></tr><tr><td><span class="badge medium">MEDIUM</span></td><td>A02:2025<br><small>Security Misconfiguration</small></td><td>Missing Content-Security-Policy<br><small>firm</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>Response did not include content-security-policy.</td><td>Review and configure the content-security-policy response header.</td></tr><tr><td><span class="badge medium">MEDIUM</span></td><td>A02:2025<br><small>Security Misconfiguration</small></td><td>No clickjacking protection<br><small>firm</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>Neither X-Frame-Options nor CSP frame-ancestors is set.</td><td>Set CSP frame-ancestors (or X-Frame-Options) to restrict framing.</td></tr><tr><td><span class="badge low">LOW</span></td><td>A02:2025<br><small>Security Misconfiguration</small></td><td>Missing Permissions-Policy<br><small>firm</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>Response did not include permissions-policy.</td><td>Review and configure the permissions-policy response header.</td></tr><tr><td><span class="badge low">LOW</span></td><td>A02:2025<br><small>Security Misconfiguration</small></td><td>Missing Referrer-Policy<br><small>firm</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>Response did not include referrer-policy.</td><td>Review and configure the referrer-policy response header.</td></tr><tr><td><span class="badge low">LOW</span></td><td>A02:2025<br><small>Security Misconfiguration</small></td><td>Missing X-Content-Type-Options<br><small>firm</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>Response did not include x-content-type-options.</td><td>Review and configure the x-content-type-options response header.</td></tr><tr><td><span class="badge low">LOW</span></td><td>A02:2025<br><small>Security Misconfiguration</small></td><td>Server version disclosed<br><small>firm</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>Server header: &#x27;SimpleHTTP/0.6 Python/3.14.7&#x27;.</td><td>Remove version details from the Server header.</td></tr><tr><td><span class="badge low">LOW</span></td><td>A04:2025<br><small>Cryptographic Failures</small></td><td>Credential page may be cached<br><small>firm</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>Page has a password field but Cache-Control lacks no-store.</td><td>Send Cache-Control: no-store on pages handling credentials.</td></tr><tr><td><span class="badge informational">INFORMATIONAL</span></td><td>A01:2025<br><small>Broken Access Control</small></td><td>CORS allows any origin<br><small>indicator</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>Access-Control-Allow-Origin: *.</td><td>Confirm this resource is public and carries no user-specific data.</td></tr><tr><td><span class="badge informational">INFORMATIONAL</span></td><td>A07:2025<br><small>Authentication Failures</small></td><td>Login form shows no CAPTCHA or MFA hint<br><small>indicator</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>No CAPTCHA widget or one-time-code field was seen near the login form.</td><td>Confirm server-side rate limiting, lockout and MFA; this is a visibility check only.</td></tr><tr><td><span class="badge informational">INFORMATIONAL</span></td><td>A09:2025<br><small>Security Logging &amp; Alerting Failures</small></td><td>No browser reporting endpoints observed<br><small>indicator</small></td><td><a href="http://10.128.0.194:8185/">http://10.128.0.194:8185/</a></td><td>No Reporting-Endpoints, Report-To, NEL or CSP report-uri/report-to found. Server-side logging and alerting cannot be assessed from outside.</td><td>Review logging, monitoring and alerting with the application owner; consider CSP/NEL reporting.</td></tr>
+</tbody>
+</table>
+
+<h2>Limitations</h2>
+<ul><li>Coverage describes what this scanner looks for, not assurance that a category is free of issues.</li><li>Findings marked &#x27;indicator&#x27; are heuristics (CSRF, injection, auth, SSRF, design) and need manual validation.</li><li>Insecure Design and Logging/Alerting need architecture review and server-side evidence.</li><li>Content rendered after DOMContentLoaded + 0.5s, and authenticated areas without --storage-state, may be missed.</li></ul>
+
+</body>
+</html>
